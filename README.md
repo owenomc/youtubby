@@ -186,11 +186,6 @@ Contributions are welcome. To get started:
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Author
-
-**Owen Crandall**
-[LinkedIn](https://www.linkedin.com/in/owen-crandall/)
-
 ## Disclaimer
 
 YouTubby is an educational project and is not affiliated with or endorsed by YouTube or Google.
