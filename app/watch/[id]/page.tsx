@@ -1,24 +1,14 @@
 import { notFound } from "next/navigation";
+
 import { getVideos } from "@/app/lib/videos";
+
 import VideoCard from "@/app/components/VideoCard";
+import VideoCreator from "@/app/components/VideoCreator";
 import Footer from "@/app/components/Footer";
 import Navbar from "@/app/components/Navbar";
 import WatchPlayer from "@/app/components/WatchPlayer";
-import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 
 export const dynamic = "force-dynamic";
-
-const display = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const body = Instrument_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-});
 
 export default async function WatchPage({
   params,
@@ -26,23 +16,29 @@ export default async function WatchPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
   const videoId = decodeURIComponent(id);
 
   const videos = await getVideos();
-  const video = videos.find((v) => v.id === videoId);
 
-  if (!video) notFound();
+  const video = videos.find(
+    (v) => v.id === videoId,
+  );
 
-  const more = videos.filter((v) => v.id !== video.id).slice(0, 8);
+  if (!video) {
+    notFound();
+  }
+
+  const more = videos
+    .filter((v) => v.id !== video.id)
+    .slice(0, 8);
 
   return (
-    <div
-      className={`${display.variable} ${body.variable} min-h-screen bg-[#F6F7FF] font-[family-name:var(--font-body)] text-[#14143A]`}
-    >
-      <section className="text-[#14143A]">
-        <Navbar />
+    <div className="min-h-screen bg-[var(--background)] font-[family-name:var(--font-body)] text-[var(--foreground)]">
+      <Navbar />
 
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-6 pb-20 sm:px-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <main className="mx-auto grid max-w-7xl gap-8 px-5 py-6 pb-20 sm:px-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div>
           <WatchPlayer
             key={video.id}
             id={video.id}
@@ -51,19 +47,31 @@ export default async function WatchPage({
             initialViews={video.views}
           />
 
-          {more.length > 0 && (
-            <aside aria-label="Recommended videos" className="hidden lg:block">
-              <ul className="space-y-6">
-                {more.map((v) => (
-                  <VideoCard key={v.id} video={v} />
-                ))}
-              </ul>
-            </aside>
+          {video.username && (
+            <VideoCreator
+              username={video.username}
+            />
           )}
         </div>
 
-        <Footer />
-      </section>
+        {more.length > 0 && (
+          <aside
+            aria-label="Recommended videos"
+            className="hidden lg:block"
+          >
+            <ul className="space-y-6">
+              {more.map((v) => (
+                <VideoCard
+                  key={v.id}
+                  video={v}
+                />
+              ))}
+            </ul>
+          </aside>
+        )}
+      </main>
+
+      <Footer />
     </div>
   );
 }

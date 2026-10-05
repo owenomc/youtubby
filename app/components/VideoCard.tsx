@@ -19,9 +19,9 @@ export default function VideoCard({ video }: { video: Video }) {
     <li>
       <Link
         href={`/watch/${encodeURIComponent(video.id)}`}
-        className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2326E8]"
+        className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--primary)]"
       >
-        <div className="relative aspect-video overflow-hidden">
+        <div className="relative aspect-video overflow-hidden rounded-2xl">
           <video
             src={`${video.src}#t=0.5`}
             preload="metadata"
@@ -29,17 +29,21 @@ export default function VideoCard({ video }: { video: Video }) {
             playsInline
             className="h-full w-full object-cover"
           />
+
           <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white pr-1">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black pr-1 text-white">
               <PlayIcon className="ml-0.5 h-6 w-6" />
             </span>
           </div>
         </div>
-        <h3 className="px-4 pt-4 line-clamp-2 font-semibold capitalize leading-snug text-black group-hover:underline">
+
+        <h3 className="line-clamp-2 px-4 pt-4 font-semibold capitalize leading-snug text-[var(--foreground)] group-hover:underline">
           {video.title}
         </h3>
-        <p className="px-4 pb-4 pt-1 text-sm text-black/60">
-          {video.views.toLocaleString()} {video.views === 1 ? "view" : "views"}
+
+        <p className="px-4 pb-4 pt-1 text-sm text-[var(--muted)]">
+          {video.views.toLocaleString()}{" "}
+          {video.views === 1 ? "view" : "views"}
         </p>
       </Link>
     </li>

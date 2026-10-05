@@ -12,7 +12,7 @@ export default async function AuthButton() {
           await signIn("cognito");
         }}
       >
-        <button className="rounded-full border-2 border-black px-4 py-2 text-black">
+        <button className="rounded-full border-2 border-[var(--border)] px-4 py-2 text-[var(--foreground)] transition hover:bg-[var(--dropdown-hover)]">
           Sign in
         </button>
       </form>
@@ -26,7 +26,7 @@ export default async function AuthButton() {
         await signOut();
       }}
     >
-      <button className="rounded-full border-2 border-black px-4 py-2 text-black">
+      <button className="rounded-full border-2 border-[var(--border)] px-4 py-2 text-[var(--foreground)] transition hover:bg-[var(--dropdown-hover)]">
         Sign out ({session.user.name ?? session.user.email})
       </button>
     </form>

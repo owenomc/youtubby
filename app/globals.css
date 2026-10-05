@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base colors */
+  --background-light: #F6F7FF;
+  --background-dark: #101014;
+
+  --foreground-light: #14143A;
+  --foreground-dark: #FFFFFF;
+
+  --card-light: #FFFFFF;
+  --card-dark: #202024;
+
+  --dropdown-light: #FFFFFF;
+  --dropdown-dark: #303038;
+
+  --border-light: rgba(0, 0, 0, 0.05);
+  --border-dark: rgba(255, 255, 255, 0.1);
+
+  --muted-light: rgba(0, 0, 0, 0.5);
+  --muted-dark: rgba(255, 255, 255, 0.5);
+
+  /* Primary */
+  --primary: #2326E8;
+  --primary-hover: #1D20C9;
+
+  /* Light theme */
+  --background: var(--background-light);
+  --foreground: var(--foreground-light);
+  --card: var(--card-light);
+  --dropdown: var(--dropdown-light);
+  --border: var(--border-light);
+  --muted: var(--muted-light);
+
+  /* Dropdown */
+  --dropdown-foreground: #14143A;
+  --dropdown-muted: rgba(0, 0, 0, 0.5);
+  --dropdown-hover: rgba(0, 0, 0, 0.05);
+  --dropdown-border: rgba(0, 0, 0, 0.05);
+  --dropdown-inner: rgba(0, 0, 0, 0.04);
+  --dropdown-icon: rgba(0, 0, 0, 0.7);
+  --dropdown-toggle-off: rgba(0, 0, 0, 0.15);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* Active dark theme */
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
+  --card: var(--card-dark);
+  --dropdown: var(--dropdown-dark);
+  --border: var(--border-dark);
+  --muted: var(--muted-dark);
+
+  /* Dropdown */
+  --dropdown-foreground: #FFFFFF;
+  --dropdown-muted: rgba(255, 255, 255, 0.55);
+  --dropdown-hover: rgba(255, 255, 255, 0.1);
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-inner: rgba(0, 0, 0, 0.2);
+  --dropdown-icon: rgba(255, 255, 255, 0.7);
+  --dropdown-toggle-off: rgba(255, 255, 255, 0.15);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
