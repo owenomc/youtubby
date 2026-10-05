@@ -2,7 +2,23 @@ import { notFound } from "next/navigation";
 import { getVideos } from "@/app/lib/videos";
 import VideoCard from "@/app/components/VideoCard";
 import Footer from "@/app/components/Footer";
-import SearchBar from "@/app/components/SearchBar";
+import Navbar from "@/app/components/Navbar";
+import WatchPlayer from "@/app/components/WatchPlayer";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+
+export const dynamic = "force-dynamic";
+
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const body = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export default async function WatchPage({
   params,
@@ -20,43 +36,34 @@ export default async function WatchPage({
   const more = videos.filter((v) => v.id !== video.id).slice(0, 8);
 
   return (
-    <div className="min-h-screen bg-[#F6F7FF] text-[#14143A]">
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-6 pb-20 sm:px-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        {/* Main video */}
+    <div
+      className={`${display.variable} ${body.variable} min-h-screen bg-[#F6F7FF] font-[family-name:var(--font-body)] text-[#14143A]`}
+    >
+      <section className="text-[#14143A]">
+        <Navbar />
 
-        <div>
-          <div className="mb-8">
-            <SearchBar />
-          </div>
-          <div className="aspect-video overflow-hidden rounded-2xl bg-black">
-            <video
-              key={video.src}
-              src={video.src}
-              controls
-              autoPlay
-              playsInline
-              className="h-full w-full"
-            />
-          </div>
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-6 pb-20 sm:px-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <WatchPlayer
+            key={video.id}
+            id={video.id}
+            src={video.src}
+            title={video.title}
+            initialViews={video.views}
+          />
 
-          <h1 className="mt-4 text-2xl font-bold capitalize tracking-tight sm:text-3xl">
-            {video.title}
-          </h1>
+          {more.length > 0 && (
+            <aside aria-label="Recommended videos" className="hidden lg:block">
+              <ul className="space-y-6">
+                {more.map((v) => (
+                  <VideoCard key={v.id} video={v} />
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
 
-        {/* Recommended */}
-        {more.length > 0 && (
-          <aside aria-label="Recommended videos">
-            <ul className="space-y-6">
-              {more.map((v) => (
-                <VideoCard key={v.id} video={v} />
-              ))}
-            </ul>
-          </aside>
-        )}
-      </div>
-
-      <Footer />
+        <Footer />
+      </section>
     </div>
   );
 }

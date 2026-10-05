@@ -35,9 +35,12 @@ export default function VideoCard({ video }: { video: Video }) {
             </span>
           </div>
         </div>
-        <h3 className="py-4 px-4 line-clamp-2 font-semibold capitalize leading-snug text-black group-hover:underline">
+        <h3 className="px-4 pt-4 line-clamp-2 font-semibold capitalize leading-snug text-black group-hover:underline">
           {video.title}
         </h3>
+        <p className="px-4 pb-4 pt-1 text-sm text-black/60">
+          {video.views.toLocaleString()} {video.views === 1 ? "view" : "views"}
+        </p>
       </Link>
     </li>
   );

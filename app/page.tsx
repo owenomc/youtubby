@@ -1,11 +1,13 @@
+// app/page.tsx
 import Footer from "@/app/components/Footer";
-import SearchBar from "@/app/components/SearchBar";
+import Navbar from "@/app/components/Navbar";
 import VideoCard from "@/app/components/VideoCard";
 import { getVideos } from "@/app/lib/videos";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
+
+export const dynamic = "force-dynamic";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -22,46 +24,17 @@ const body = Instrument_Sans({
 export default async function LandingPage() {
   const videos = await getVideos();
 
+  const trending = [...videos]
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 6);
+
   return (
     <div
       className={`${display.variable} ${body.variable} min-h-screen bg-[#F6F7FF] font-[family-name:var(--font-body)] text-[#14143A]`}
     >
       {/* Hero */}
       <section className="text-white">
-        <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
-          <Link
-            href="/"
-            className="flex items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FFD23F]"
-          >
-            <Image
-              src="/logo.png"
-              alt="YouTubby Logo"
-              width={36}
-              height={36}
-              className="h-8 w-8 object-contain"
-            />
-            <span className="text-2xl font-extrabold tracking-tight text-black">
-              YouTubby
-            </span>
-          </Link>
-
-          <SearchBar />
-
-          <nav aria-label="Account" className="hidden md:flex items-center gap-2">
-            <Link
-              href="/signin"
-              className="rounded-full px-4 py-2 font-medium text-black hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FFD23F]"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-full bg-[#2326e8] px-5 py-2 text-white transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              Sign Up
-            </Link>
-          </nav>
-        </header>
+        <Navbar />
 
         <div className="hidden md:flex mx-auto max-w-7xl items-center gap-12 px-5 pt-10 sm:px-8 lg:grid-cols-2 pt-16">
           <div>
@@ -110,13 +83,14 @@ export default async function LandingPage() {
           </Link>
         </div>
 
-        {videos.length === 0 ? (
+        {trending.length === 0 ? (
           <p className="mt-10 text-black/70">
-            No videos yet. Add .mp4 files to public/videos.
+            No videos yet. Upload .mp4 files to the videos/ folder in your S3
+            bucket.
           </p>
         ) : (
-          <ul className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-            {videos.map((video) => (
+          <ul className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {trending.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </ul>
