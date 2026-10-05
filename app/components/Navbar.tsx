@@ -23,6 +23,65 @@ const LANGUAGES = [
   "Mandarin",
 ];
 
+// Settings page dispatches this after a picture upload or username change.
+// Optional detail: { username?: string }
+export const PROFILE_UPDATED_EVENT = "youtubby-profile-updated";
+
+function profilePictureUrl(username: string) {
+  return `/api/profile-picture?username=${encodeURIComponent(
+    username,
+  )}&t=${Date.now()}`;
+}
+
+// Shows the uploaded picture, or a user icon when there is none (empty src
+// or the image failed to load).
+function Avatar({
+  src,
+  alt,
+  onError,
+}: {
+  src: string;
+  alt: string;
+  onError: () => void;
+}) {
+  if (!src) {
+    return (
+      <span
+        className="flex h-full w-full items-center justify-center bg-[var(--primary)] text-white"
+        role={alt ? "img" : undefined}
+        aria-label={alt || undefined}
+        aria-hidden={alt ? undefined : true}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-6 w-6"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={40}
+      height={40}
+      unoptimized
+      onError={onError}
+      className="h-full w-full object-cover"
+    />
+  );
+}
+
 function Icon({ children }: { children: React.ReactNode }) {
   return (
     <span className="flex h-5 w-5 shrink-0 items-center justify-center text-[var(--dropdown-icon)]">
@@ -76,7 +135,7 @@ function applyTheme(theme: Theme) {
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
-  const [profilePicture, setProfilePicture] = useState("/logo.png");
+  const [profilePicture, setProfilePicture] = useState("");
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
@@ -117,22 +176,45 @@ export default function Navbar() {
           (attribute) => attribute.getName() === "email",
         );
 
-        const pictureAttribute = attributes.find(
-          (attribute) => attribute.getName() === "picture",
-        );
-
         const currentUsername =
           usernameAttribute?.getValue() ||
           emailAttribute?.getValue().split("@")[0] ||
           "";
 
-        const currentPicture = pictureAttribute?.getValue() || "/logo.png";
-
         setUsername(currentUsername);
-        setProfilePicture(currentPicture);
+
+        // Pictures live in S3 and are served by /api/profile-picture,
+        // keyed by username (same URL the settings page uses).
+        if (currentUsername) {
+          setProfilePicture(profilePictureUrl(currentUsername));
+        }
       });
     });
   }, []);
+
+  // Refresh the avatar (and username) when settings changes them.
+  useEffect(() => {
+    function handleProfileUpdated(event: Event) {
+      const detail = (event as CustomEvent<{ username?: string }>).detail;
+      const nextUsername = detail?.username || username;
+
+      if (!nextUsername) {
+        return;
+      }
+
+      if (nextUsername !== username) {
+        setUsername(nextUsername);
+      }
+
+      setProfilePicture(profilePictureUrl(nextUsername));
+    }
+
+    window.addEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdated);
+
+    return () => {
+      window.removeEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdated);
+    };
+  }, [username]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -186,6 +268,11 @@ export default function Navbar() {
     setLanguage(nextLanguage);
     window.localStorage.setItem("youtubby-language", nextLanguage);
     setIsLanguageOpen(false);
+  }
+
+  function handlePictureError() {
+    // No uploaded picture (404) or a failed load: show the user icon instead.
+    setProfilePicture("");
   }
 
   const profileHref = username ? `/@${encodeURIComponent(username)}` : "/";
@@ -258,12 +345,10 @@ export default function Navbar() {
                 }}
                 className="flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full transition hover:scale-105 hover:bg-[var(--primary-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
               >
-                <Image
+                <Avatar
                   src={profilePicture}
                   alt="Your profile picture"
-                  width={40}
-                  height={40}
-                  className="h-full w-full object-cover"
+                  onError={handlePictureError}
                 />
               </button>
 
@@ -277,12 +362,10 @@ export default function Navbar() {
                     className="flex items-center gap-3 rounded-md px-2.5 py-2.5 transition hover:bg-[var(--dropdown-hover)]"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--background)]">
-                      <Image
+                      <Avatar
                         src={profilePicture}
                         alt=""
-                        width={40}
-                        height={40}
-                        className="h-full w-full object-cover"
+                        onError={handlePictureError}
                       />
                     </div>
 
